@@ -1,0 +1,212 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Mastermind</title>
+  <meta name="description" content="The game">
+  <meta name="author" content="Philipp">
+
+  <link rel="stylesheet" href="mm.css">
+
+</head>
+
+<body>
+  
+<h1> Mastermind</h1>
+<div id="container1"></div>
+<div id="container2"></div>
+
+<button id=cbutton>Check</button>
+
+<select id="ccolor">
+  <option value="yellow">Yellow</option>
+  <option value="red">Red</option>
+  <option value="blue">Blue</option>
+  <option value="orange">Orange</option>
+  <option value="black">Black</option>
+  <option value="white">White</option>
+  <option value="green">Green</option>
+  <option value="purple">Purple</option>
+</select>
+
+
+
+  
+  <script>
+//
+//Get variables needed
+let container1= document.getElementById("container1");
+let container2 = document.getElementById("container2");
+let grid1 = document.getElementsByClassName("grid1");
+let grid2 = document.getElementsByClassName("grid2");
+let globalcella= [];
+let globalcellb= [];
+
+//
+//create grid for the computer answer
+function cgrid1(){
+  for (var k = 0; k<10;k++){function ingrid(){
+      for (var i=0;i<4; i++){
+        let div = document.createElement("div");
+        div.className = "grid1";
+        let a=  container1.appendChild(div);
+        a.id= `${k}${i}`;
+        globalcella.push(a);
+        }
+      }      
+      ingrid()
+  }
+}
+cgrid1()
+//
+//create grid for the player input
+function cgrid2(){
+  for (var k = 0; k<10;k++){function ingrid(){
+      for (var i=0;i<4; i++){
+        let div = document.createElement("div");
+        div.className = "grid2";
+        let b=  container2.appendChild(div);
+        b.id= `${k}${i}`;
+        globalcellb.push(b);
+        }
+      }      
+      ingrid()
+  }  
+}
+cgrid2()
+
+//
+//create the combination to crack and check if there are no repeats
+function code(){return Math.floor(Math.random()*8)}
+let codeall = [];
+
+function docode(){
+for (i=0;i<4;i++){
+codeall.push(code())
+}
+}
+docode()
+
+function changecode(){if(codeall[0] == codeall[1] || codeall[0] == codeall[2] || codeall[0] == codeall[3] || codeall[1] == codeall[2] || codeall[1] == codeall[3] || codeall[2] == codeall[3])
+  {codeall = [];
+  docode()
+  changecode()
+}
+}
+changecode()
+for (i=0;i<4; i++){
+let dummy = codeall[i];
+switch(dummy){
+  case 0: 
+  codeall[i] = "black";
+  break;
+  case 1: 
+  codeall[i] = "white";
+  break;
+  case 2: 
+  codeall[i] = "yellow";
+  break;
+  case 3: 
+  codeall[i] = "orange";
+  break;
+  case 4: 
+  codeall[i] = "red";
+  break;
+  case 5: 
+  codeall[i] = "blue";
+  break;
+  case 6: 
+  codeall[i] = "green";
+  break;
+  case 7: 
+  codeall[i] = "purple";
+  break;
+  
+}
+}
+ //
+//change color of second grid when clicked and lock color
+let cselector = document.getElementById("ccolor");
+cselector.addEventListener("click",function (){cselector.style.backgroundColor = cselector.value})
+cselector.style.backgroundColor = cselector.value;
+
+function givecolor(){
+  for(var j=0;j<globalcellb.length;j++){
+    globalcellb[j].addEventListener("click",function stylecolor(){
+      for(var j=0;j<globalcellb.length;j++){
+        this.style.backgroundColor = cselector.value;
+
+        globalcellb[j].removeEventListener("click",stylecolor);
+      }
+    })
+  }
+}
+
+givecolor();
+
+// test code for debugging codeall=["red","yellow","blue","green"]
+
+
+//
+//Evaluate if answer is correct or not and paint first grid in black or white
+let sumrow4 = 4;
+let sumrow0 =0;
+let sumcode =0;
+let randomarray=[];
+let randombwv =0;
+let sumrow4b= 4;
+let sumrow0b = 0;
+let wincounter =0;
+let cbutton = document.getElementById("cbutton")
+function checkresult(){
+  cbutton.addEventListener("click", function(){
+    function do4check(){
+      for (sumrow0b;sumrow0b < sumrow4b;sumrow0b++){
+        if (globalcellb[sumrow0b].style.backgroundColor == ""){
+          sumrow0b = sumrow4b-4;
+          return alert("Please fill the top 4 brown boxes with a color")
+
+        }
+      }
+      sumrow4b= sumrow0b+4;
+      for(sumrow0; sumrow0<sumrow4;sumrow0++){
+        
+        
+        
+        function randombw() { return randombwv= (Math.floor(Math.random()*4))+sumrow4-4}
+        function checkrandombw(){
+          randombw()
+          if(randombwv ==randomarray[0]||randombwv ==randomarray[1]||randombwv ==randomarray[2]||randombwv ==randomarray[3])
+          {checkrandombw()}
+          
+        }
+        checkrandombw();
+        randomarray.push(randombwv)
+         if(globalcellb[sumrow0].style.backgroundColor != codeall[sumrow0-sumcode] && (globalcellb[sumrow0].style.backgroundColor ==codeall[0] || globalcellb[sumrow0].style.backgroundColor ==codeall[1] || globalcellb[sumrow0].style.backgroundColor ==codeall[2] ||globalcellb[sumrow0].style.backgroundColor ==codeall[3] ))
+        { globalcella[randombwv].style.backgroundColor ="black"}
+        
+          
+        else if (globalcellb[sumrow0].style.backgroundColor == codeall[sumrow0-sumcode])
+        {wincounter++;
+          globalcella[randombwv].style.backgroundColor= "white"}
+        
+        if(wincounter ==4){return alert("You won, congratulations")}
+        
+      }
+      sumrow4 =4+sumrow4;
+      sumcode = 4+sumcode;
+      randomarray=[];
+      wincounter=0;
+      
+    }
+    do4check()  
+   
+  } )
+
+}
+checkresult()
+  </script>
+</body>
+</html>
